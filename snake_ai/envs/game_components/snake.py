@@ -1,7 +1,7 @@
 import pygame
 from typing import Tuple, List
 from snake_ai.envs.game_components.renderable import Renderable
-from snake_ai.envs.utils.custom_types import Position
+from snake_ai.envs.utils.custom_types import Position, Direction, Action
 from snake_ai.envs.utils.position_handler import PositionHandler
 
 class Snake(Renderable):
@@ -16,8 +16,17 @@ class Snake(Renderable):
             self.body_parts.append(PositionHandler.get_right_position(self.body_parts[-1]))
 
         self._body_parts_colors = [(0, 255, 255), (127, 255, 212)]
+
+        self._heading_direction: Direction = Direction.WEST
+
+        self._map_action_to_heading_direction = {
+            Action.MOVE_UP.value: Direction.NORTH,
+            Action.MOVE_DOWN.value: Direction.SOUTH,
+            Action.MOVE_LEFT.value: Direction.WEST,
+            Action.MOVE_RIGHT.value: Direction.EAST
+        }
     
-    def render(self, window: pygame.Surface, pix_square_size) -> None:
+    def render(self, window: pygame.Surface, pix_square_size: float) -> None:
         
         for i, body_part in enumerate(self.body_parts):
 
@@ -29,4 +38,13 @@ class Snake(Renderable):
                     (pix_square_size, pix_square_size),
                 ),
             )
+    
+    def act(self, action: Action):
+
+        # print(action, self._map_action_to_heading_direction)
+        self._heading_direction = self._heading_direction if action == Action.NOOP.value else self._map_action_to_heading_direction[action]
+        future_head_position = PositionHandler.move_to_direction(self.head_position, self._heading_direction)
+        self.body_parts.pop()
+        self.body_parts.insert(0, future_head_position)
+        self.head_position = future_head_position
     

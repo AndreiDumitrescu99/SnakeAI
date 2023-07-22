@@ -27,12 +27,23 @@ class GridWorldEnv(gym.Env):
             size=5,
             initial_head_position=(mid_point, mid_point)
         )
+
+        self.tick = 0
+        self.action = 0
     
     def step(self, action: any):
         """
         """
 
         self._render_frame()
+        self.snake.act(self.action % 5)
+
+        if self.tick % 4 == 0:
+            self.action = self.action + 1
+            if self.action % 5 == 0:
+                self.action = self.action + 1
+        
+        self.tick += 1
     
     def close(self):
         if self.window is not None:
@@ -82,12 +93,12 @@ class GridWorldEnv(gym.Env):
 
         # We need to ensure that human-rendering occurs at the predefined framerate.
         # The following line will automatically add a delay to keep the framerate stable.
-        self.clock.tick(1)
+        self.clock.tick(30)
 
 if __name__ == "__main__":
 
     grid_env = GridWorldEnv(
-        window_size=1024,
+        window_size=512,
         grid_size=32
     )
     while True:

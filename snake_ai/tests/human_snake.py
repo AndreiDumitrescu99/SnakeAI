@@ -32,7 +32,7 @@ def play():
         # Getting action:
         action = 0
         for event in pygame.event.get():
-            print(event)
+
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
@@ -47,9 +47,15 @@ def play():
         # Processing:
         obs, reward, done, _, info = env.step(action)
 
+        score = score + reward
         clock.tick(15)
 
+        if done:
+            env.render()
+            break
+
     env.close()
+    print("Overall score: ", score)
 
 if __name__ == "__main__":
     play()

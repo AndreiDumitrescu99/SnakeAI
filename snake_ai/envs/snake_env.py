@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+from typing import List
 
 import gymnasium as gym
 from gymnasium import spaces
@@ -7,6 +8,7 @@ from gymnasium import Wrapper
 
 from snake_ai.envs.game_components.snake import Snake
 from snake_ai.envs.game_components.wall import Wall
+from snake_ai.envs.utils.state_handler import StateHandler
 
 class SnakeEnv(gym.Env):
 
@@ -31,7 +33,7 @@ class SnakeEnv(gym.Env):
         )
 
         # Get walls.
-        self.walls: Wall = []
+        self.walls: List[Wall] = []
         self._init_outer_walls()
 
         # Define actions space.
@@ -52,6 +54,10 @@ class SnakeEnv(gym.Env):
         self.tick = 0
         self.action = 0
 
+        # Init State Handler.
+        self.state_handler = StateHandler(self.grid_size, self.walls, self.snake.body_parts)
+
+        self.state_handler._print_map()
     
     def _init_outer_walls(self):
 
@@ -69,15 +75,13 @@ class SnakeEnv(gym.Env):
         self.action = action
         self.snake.act(self.action)
 
-        # if self.tick % 4 == 0:
-        #     self.action = self.action + 1
-        #     if self.action % 5 == 0:
-        #         self.action = self.action + 1
-        
-        # self.tick += 1
+        is_alive = self.state_handler.update_state(self.snake.body_parts)
+        observation = self.state_handler.get_observation()
 
-        # TODO!
-        return self.observation_space, 0, False, False, {}
+        # TODO! Change This!
+        reward = 0.1 if is_alive else -10
+
+        return observation, reward, not is_alive, False, {}
     
     def close(self):
 
@@ -134,15 +138,3 @@ class SnakeEnv(gym.Env):
         # We need to ensure that human-rendering occurs at the predefined framerate.
         # The following line will automatically add a delay to keep the framerate stable.
         self.clock.tick(30)
-
-if __name__ == "__main__":
-
-    grid_env = SnakeEnv(
-        window_size=768,
-        grid_size=32,
-        debug_grid = True
-    )
-    while True:
-        grid_env.step(0)
-
-        

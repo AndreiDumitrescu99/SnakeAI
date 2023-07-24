@@ -15,3 +15,8 @@ class Action(Enum):
     MOVE_RIGHT = 2
     MOVE_DOWN = 3
     MOVE_LEFT = 4
+
+class ComponentCode(Enum):
+    EMPTY_SPACE = 0
+    SNAKE = 1
+    WALL = 2

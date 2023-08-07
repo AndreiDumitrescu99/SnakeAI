@@ -20,3 +20,4 @@ class ComponentCode(Enum):
     EMPTY_SPACE = 0
     SNAKE = 1
     WALL = 2
+    FOOD = 3

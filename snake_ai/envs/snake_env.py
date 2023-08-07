@@ -9,10 +9,11 @@ from gymnasium import Wrapper
 from snake_ai.envs.game_components.snake import Snake
 from snake_ai.envs.game_components.wall import Wall
 from snake_ai.envs.utils.state_handler import StateHandler
+from snake_ai.envs.game_components.food import Food
 
 class SnakeEnv(gym.Env):
 
-    def __init__(self, window_size: int = 512, grid_size: int = 8, debug_grid: bool = True, render_mode="rgb_array"):
+    def __init__(self, window_size: int = 512, grid_size: int = 8, number_of_rewards: int = 1, debug_grid: bool = True, render_mode="rgb_array"):
         """
         """
 
@@ -36,6 +37,10 @@ class SnakeEnv(gym.Env):
         self.walls: List[Wall] = []
         self._init_outer_walls()
 
+        # Define rewards.
+        self.rewards: List[Food] = []
+        self.number_of_rewards = number_of_rewards
+
         # Define actions space.
         self.action_space = gym.spaces.Discrete(5)
 
@@ -55,7 +60,8 @@ class SnakeEnv(gym.Env):
         self.action = 0
 
         # Init State Handler.
-        self.state_handler = StateHandler(self.grid_size, self.walls, self.snake.body_parts)
+        self.state_handler = StateHandler(self.grid_size, self.walls, self.snake.body_parts, self.number_of_rewards)
+        self.rewards = self.state_handler.rewards
 
         self.state_handler._print_map()
     
@@ -75,11 +81,12 @@ class SnakeEnv(gym.Env):
         self.action = action
         self.snake.act(self.action)
 
-        is_alive = self.state_handler.update_state(self.snake.body_parts)
+        reward = self.state_handler.update_state(self.snake.body_parts)
+        self.rewards = self.state_handler.rewards
         observation = self.state_handler.get_observation()
 
         # TODO! Change This!
-        reward = 0.1 if is_alive else -10
+        is_alive = True if reward != -10 else False
 
         return observation, reward, not is_alive, False, {}
     
@@ -113,6 +120,8 @@ class SnakeEnv(gym.Env):
         self.snake.render(canvas, pix_square_size)
         for wall in self.walls:
             wall.render(canvas, pix_square_size)
+        for food in self.rewards:
+            food.render(canvas, pix_square_size)
 
         if self.debug_grid:
             for x in range(self.grid_size + 1):

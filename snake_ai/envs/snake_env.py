@@ -40,6 +40,7 @@ class SnakeEnv(gym.Env):
         # Define rewards.
         self.rewards: List[Food] = []
         self.number_of_rewards = number_of_rewards
+        self.overall_reward = 0.0
 
         # Define actions space.
         self.action_space = gym.spaces.Discrete(5)
@@ -63,7 +64,12 @@ class SnakeEnv(gym.Env):
         self.state_handler = StateHandler(self.grid_size, self.walls, self.snake.body_parts, self.number_of_rewards)
         self.rewards = self.state_handler.rewards
 
+        pygame.init()
         self.state_handler._print_map()
+        
+        self.font = pygame.font.SysFont(pygame.font.get_default_font(), 32)
+
+        self.text = None
     
     def _init_outer_walls(self):
 
@@ -82,6 +88,7 @@ class SnakeEnv(gym.Env):
         self.snake.act(self.action)
 
         reward = self.state_handler.update_state(self.snake.body_parts)
+        self.overall_reward += reward
         self.rewards = self.state_handler.rewards
         observation = self.state_handler.get_observation()
 
@@ -104,7 +111,8 @@ class SnakeEnv(gym.Env):
         """
 
         if self.window is None:
-            self.window = pygame.display.set_mode((self.window_size, self.window_size))
+            self.window_offset = self.window_size // 10
+            self.window = pygame.display.set_mode((self.window_size, self.window_size + self.window_offset))
         
         if self.clock is None:
             self.clock = pygame.time.Clock()
@@ -141,6 +149,18 @@ class SnakeEnv(gym.Env):
                 )
 
         self.window.blit(canvas, canvas.get_rect())
+
+        if self.text != None:
+            text = self.font.render(self.text, True, (0, 0, 0))
+            textRect = text.get_rect()
+            textRect.center = (self.window_size // 2, self.window_size + self.window_offset // 2)
+            self.window.blit(text, textRect)
+        
+        self.text = 'Results: ' + str(self.overall_reward)
+        text = self.font.render(self.text, True, (255, 255, 255))
+        textRect = text.get_rect()
+        textRect.center = (self.window_size // 2, self.window_size + self.window_offset // 2)
+        self.window.blit(text, textRect)
         pygame.event.pump()
         pygame.display.update()
 

@@ -10,10 +10,19 @@ from snake_ai.envs.game_components.snake import Snake
 from snake_ai.envs.game_components.wall import Wall
 from snake_ai.envs.utils.state_handler import StateHandler
 from snake_ai.envs.game_components.food import Food
+from snake_ai.envs.utils.custom_types import Color
 
 class SnakeEnv(gym.Env):
 
-    def __init__(self, window_size: int = 512, grid_size: int = 8, number_of_rewards: int = 1, debug_grid: bool = True, render_mode="rgb_array"):
+    def __init__(
+        self,
+        window_size: int = 512,
+        grid_size: int = 8,
+        number_of_rewards: int = 1,
+        debug_grid: bool = True,
+        render_score: bool = True,
+        render_mode="rgb_array",
+    ):
         """
         """
 
@@ -24,6 +33,10 @@ class SnakeEnv(gym.Env):
         self.clock = None
 
         self.debug_grid = debug_grid
+        self.render_score = render_score
+        
+        # Magic Number
+        self.window_offset = 20.0 if self.render_score else 0.0
 
         mid_point = self.grid_size // 2 - 1 if self.grid_size % 2 == 0 else self.grid_size // 2
 
@@ -67,7 +80,7 @@ class SnakeEnv(gym.Env):
         pygame.init()
         self.state_handler._print_map()
         
-        self.font = pygame.font.SysFont(pygame.font.get_default_font(), 32)
+        self.font = pygame.font.SysFont(pygame.font.get_default_font(), 24)
 
         self.text = None
     
@@ -105,20 +118,32 @@ class SnakeEnv(gym.Env):
     
     def render(self) -> None:
         return self._render_frame()
+    
+    def _render_score(self):
+
+        black_rectangle = pygame.Surface((self.window_size, self.window_offset))
+        black_rectangle.fill(Color.BLACK.value)
+        rectangle = black_rectangle.get_rect()
+        rectangle.center = (self.window_size // 2, self.window_offset // 2)
+        self.window.blit(black_rectangle, rectangle)
+        
+        text = self.font.render('Results: ' + str(self.overall_reward), True, Color.WHITE.value)
+        textRect = text.get_rect()
+        textRect.center = (self.window_offset * 2.5, self.window_offset // 2)
+        self.window.blit(text, textRect)
 
     def _render_frame(self):
         """
         """
 
         if self.window is None:
-            self.window_offset = self.window_size // 10
             self.window = pygame.display.set_mode((self.window_size, self.window_size + self.window_offset))
         
         if self.clock is None:
             self.clock = pygame.time.Clock()
         
         canvas = pygame.Surface((self.window_size, self.window_size))
-        canvas.fill((255, 255, 255))
+        canvas.fill(Color.WHITE.value)
         
         pix_square_size = (
             self.window_size / self.grid_size
@@ -148,19 +173,13 @@ class SnakeEnv(gym.Env):
                     width=3,
                 )
 
-        self.window.blit(canvas, canvas.get_rect())
+        canvas_rectangle = canvas.get_rect()
+        canvas_rectangle.center = (self.window_size // 2, self.window_size // 2 + self.window_offset)
+        self.window.blit(canvas, canvas_rectangle)
 
-        if self.text != None:
-            text = self.font.render(self.text, True, (0, 0, 0))
-            textRect = text.get_rect()
-            textRect.center = (self.window_size // 2, self.window_size + self.window_offset // 2)
-            self.window.blit(text, textRect)
+        if self.render_score:
+            self._render_score()
         
-        self.text = 'Results: ' + str(self.overall_reward)
-        text = self.font.render(self.text, True, (255, 255, 255))
-        textRect = text.get_rect()
-        textRect.center = (self.window_size // 2, self.window_size + self.window_offset // 2)
-        self.window.blit(text, textRect)
         pygame.event.pump()
         pygame.display.update()
 

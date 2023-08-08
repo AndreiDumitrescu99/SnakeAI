@@ -21,3 +21,7 @@ class ComponentCode(Enum):
     SNAKE = 1
     WALL = 2
     FOOD = 3
+
+class Color(Enum):
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)

@@ -1,6 +1,6 @@
 import numpy as np
 import pygame
-from typing import List
+from typing import Any, List
 
 import gymnasium as gym
 from gymnasium import spaces
@@ -20,6 +20,7 @@ class SnakeEnv(gym.Env):
         grid_size: int = 8,
         number_of_rewards: int = 1,
         debug_grid: bool = True,
+        render_frame: bool = True,
         render_score: bool = True,
         render_mode="rgb_array",
     ):
@@ -33,6 +34,7 @@ class SnakeEnv(gym.Env):
         self.clock = None
 
         self.debug_grid = debug_grid
+        self.render_frame = render_frame
         self.render_score = render_score
         
         # Magic Number
@@ -42,7 +44,7 @@ class SnakeEnv(gym.Env):
 
         # Get Snake Entity.
         self.snake = Snake(
-            size=5,
+            size=5, # TODO: SHOULD BE CONFIGURABLE!
             initial_head_position=(mid_point, mid_point)
         )
 
@@ -105,11 +107,30 @@ class SnakeEnv(gym.Env):
         self.rewards = self.state_handler.rewards
         observation = self.state_handler.get_observation()
 
-        # TODO! Change This!
+        # TODO: Change This!
         is_alive = True if reward != -10 else False
 
         return observation, reward, not is_alive, False, {}
     
+    def reset(self, *, seed: int | None = None, options: dict[str, Any] | None = None) -> tuple[Any, dict[str, Any]]:
+
+        mid_point = self.grid_size // 2 - 1 if self.grid_size % 2 == 0 else self.grid_size // 2
+
+        # Get Snake Entity.
+        self.snake = Snake(
+            size=5, # TODO: SHOULD BE CONFIGURABLE!
+            initial_head_position=(mid_point, mid_point)
+        )
+
+        self.state_handler = StateHandler(self.grid_size, self.walls, self.snake.body_parts, self.number_of_rewards)
+        self.rewards = self.state_handler.rewards
+
+        self.overall_reward = 0.0
+        self.tick = 0
+        self.action = 0
+
+        return super().reset(seed=seed, options=options)
+
     def close(self):
 
         if self.window is not None:
@@ -117,7 +138,8 @@ class SnakeEnv(gym.Env):
             pygame.quit()
     
     def render(self) -> None:
-        return self._render_frame()
+        if self.render_frame:
+            return self._render_frame()
     
     def _render_score(self):
 

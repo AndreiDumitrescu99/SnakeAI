@@ -78,7 +78,7 @@ class ActorCriticPolicy(nn.Module):
         
         return shape
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> Tuple[Categorical, torch.Tensor]:
 
         internal_embedding = x
 

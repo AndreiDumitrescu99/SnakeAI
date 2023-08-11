@@ -12,7 +12,8 @@ class ActorCriticPolicy(nn.Module):
         map_size: int = 64,
         num_of_layers: int = 4,
         channels: List[int] = [8, 16, 32, 64],
-        action_num: int = 5
+        action_num: int = 5,
+        device: torch.device = torch.device("cpu")
     ):
         super(ActorCriticPolicy, self).__init__()
 
@@ -29,7 +30,8 @@ class ActorCriticPolicy(nn.Module):
                 out_channels = channels[0],
                 kernel_size = 3,
                 stride = 1,
-                padding = "same"
+                padding = "same",
+                device=device
             )
         ]
 
@@ -40,7 +42,8 @@ class ActorCriticPolicy(nn.Module):
                     out_channels = channels[i],
                     kernel_size = 3,
                     stride = 1,
-                    padding = "same"
+                    padding = "same",
+                    device=device
                 )
             )
 
@@ -50,9 +53,9 @@ class ActorCriticPolicy(nn.Module):
             map_size = map_size
         )
 
-        self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, 128)
-        self.policy = nn.Linear(128, self.action_num)
-        self.value = nn.Linear(128, 1)
+        self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, 128, device=device)
+        self.policy = nn.Linear(128, self.action_num, device=device)
+        self.value = nn.Linear(128, 1, device=device)
     
     def compute_conv_encoder_output_shape(
         self,

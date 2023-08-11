@@ -8,7 +8,7 @@ class Food(Renderable):
 
         self.position = position
         self.color = (87, 8, 97)
-        self.value = 1.0
+        self.value = 10.0
     
     def render(self, window: pygame.Surface, pix_square_size: float) -> None:
         

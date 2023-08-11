@@ -102,6 +102,8 @@ class SnakeEnv(gym.Env):
         """
         """
         self.action = action
+
+        self.render()
         self.snake.act(self.action)
 
         reward = self.state_handler.update_state(self.snake.body_parts)
@@ -110,7 +112,8 @@ class SnakeEnv(gym.Env):
         observation = self.state_handler.get_observation()
 
         # TODO: Change This!
-        is_alive = True if reward != -10 else False
+        is_alive = True if reward != -100 else False
+        is_alive = False if self.overall_reward == 100.0 or self.overall_reward < -20.0 else True
 
         return observation, reward, not is_alive, False, {}
     
@@ -151,9 +154,9 @@ class SnakeEnv(gym.Env):
         rectangle.center = (self.window_size // 2, self.window_offset // 2)
         self.window.blit(black_rectangle, rectangle)
         
-        text = self.font.render('Results: ' + str(self.overall_reward), True, Color.WHITE.value)
+        text = self.font.render('Results: ' + str(round(self.overall_reward, 2)), True, Color.WHITE.value)
         textRect = text.get_rect()
-        textRect.center = (self.window_offset * 2.5, self.window_offset // 2)
+        textRect.center = (self.window_offset * 3.5, self.window_offset // 2)
         self.window.blit(text, textRect)
 
     def _render_frame(self):

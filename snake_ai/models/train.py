@@ -107,6 +107,7 @@ if __name__ == "__main__":
     lr = 1e-4
     seed = 13
     eval_episodes = 10
+    grid_size = 16
     path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model.pt'
     device = torch.device('cuda:0')
 
@@ -118,7 +119,7 @@ if __name__ == "__main__":
             "Snake-v0",
             render_mode="rgb_array",
             window_size=768,
-            grid_size=32
+            grid_size=grid_size
         ),
         device=device
     )
@@ -127,13 +128,13 @@ if __name__ == "__main__":
             "Snake-v0",
             render_mode="rgb_array",
             window_size=768,
-            grid_size=32,
+            grid_size=grid_size,
             render_frame=False
         ),
         device=device
     )
 
-    policy = ActorCriticPolicy().to(device)
+    policy = ActorCriticPolicy(map_size=grid_size, device=device).to(device)
     agent = A2C(
         policy=policy,
         gamma=gamma,

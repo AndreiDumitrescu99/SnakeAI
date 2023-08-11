@@ -73,11 +73,11 @@ class StateHandler:
 
     def update_state(self, snake_position: List[Position]) -> float:
 
-        overall_score = 0.0
+        overall_score = -0.01
 
         for position in snake_position:
             if self._check_wall_collision(position):
-                return -10.0
+                return -100.0
         
         for position in snake_position:
             reward = self._check_food_collision(position)

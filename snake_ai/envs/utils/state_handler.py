@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import torch as th
 import numpy as np
 from copy import deepcopy
 from snake_ai.envs.utils.custom_types import Position, ComponentCode
@@ -68,7 +69,7 @@ class StateHandler:
     
     def get_observation(self) -> np.ndarray:
 
-        return self.map
+        return np.reshape(self.map, [1, self.map_size, self.map_size])
 
     def update_state(self, snake_position: List[Position]) -> float:
 

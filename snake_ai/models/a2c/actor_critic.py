@@ -14,7 +14,7 @@ class A2C:
         gamma: float,
         optimizer: Optimizer,
         nsteps: int = 5,
-        device: str = 'cuda'
+        device: torch.device = torch.device('cpu')
     ):
 
         self._policy = policy
@@ -70,7 +70,7 @@ class A2C:
         values = self._values + [next_value]
         rewards = self._rewards
         returns = []
-        gae=0
+        gae = 0
 
         for t in reversed(range(len(rewards))):
             delta = rewards[t] + self._gamma * values[t + 1] * (1 - done) - values[t]

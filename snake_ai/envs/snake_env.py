@@ -3,6 +3,8 @@ import pygame
 from typing import Any, List
 
 import gymnasium as gym
+import torch as th
+from typing import Tuple
 from gymnasium import spaces
 from gymnasium import Wrapper
 
@@ -96,7 +98,7 @@ class SnakeEnv(gym.Env):
             self.walls.append(Wall((self.grid_size - 1, i)))
             self.walls.append(Wall((i, self.grid_size - 1)))
     
-    def step(self, action: any):
+    def step(self, action: int) -> Tuple[th.Tensor, int, bool, bool, any]:
         """
         """
         self.action = action
@@ -112,7 +114,7 @@ class SnakeEnv(gym.Env):
 
         return observation, reward, not is_alive, False, {}
     
-    def reset(self, *, seed: int | None = None, options: dict[str, Any] | None = None) -> tuple[Any, dict[str, Any]]:
+    def reset(self, *, seed: int | None = None, options: dict[str, Any] | None = None) -> Tuple[np.ndarray, any]:
 
         mid_point = self.grid_size // 2 - 1 if self.grid_size % 2 == 0 else self.grid_size // 2
 
@@ -129,7 +131,7 @@ class SnakeEnv(gym.Env):
         self.tick = 0
         self.action = 0
 
-        return super().reset(seed=seed, options=options)
+        return self.state_handler.get_observation(), {}
 
     def close(self):
 

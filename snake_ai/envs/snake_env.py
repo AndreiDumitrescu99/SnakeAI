@@ -58,6 +58,7 @@ class SnakeEnv(gym.Env):
         self.rewards: List[Food] = []
         self.number_of_rewards = number_of_rewards
         self.overall_reward = 0.0
+        self.overall_steps = 0.0
 
         # Define actions space.
         self.action_space = gym.spaces.Discrete(5)
@@ -105,6 +106,7 @@ class SnakeEnv(gym.Env):
 
         self.render()
         self.snake.act(self.action)
+        self.overall_steps += 1.0
 
         reward = self.state_handler.update_state(self.snake.body_parts)
         self.overall_reward += reward
@@ -112,10 +114,10 @@ class SnakeEnv(gym.Env):
         observation = self.state_handler.get_observation()
 
         # TODO: Change This!
-        is_alive = True if reward != -100 else False
-        is_alive = False if self.overall_reward == 100.0 or self.overall_reward < -20.0 else True
+        if reward == -100.0 or self.overall_steps > 2500 or self.overall_reward >= 50.0 or self.overall_reward < -100.0:
+            return observation, reward, True, False, {}
 
-        return observation, reward, not is_alive, False, {}
+        return observation, reward, False, False, {}
     
     def reset(self, *, seed: int | None = None, options: dict[str, Any] | None = None) -> Tuple[np.ndarray, any]:
 
@@ -133,6 +135,7 @@ class SnakeEnv(gym.Env):
         self.overall_reward = 0.0
         self.tick = 0
         self.action = 0
+        self.overall_steps = 0.0
 
         return self.state_handler.get_observation(), {}
 

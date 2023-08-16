@@ -10,8 +10,8 @@ from snake_ai.models.a2c.policy import ActorCriticPolicy
 from snake_ai.envs.snake_env import SnakeEnv
 from snake_ai.models.utils.torch_wrapper import TorchWrapper
 
-LOG_INTERVAL = 1000
-max_reward = 0
+LOG_INTERVAL = 2500
+max_reward = -100.0
 
 def _save_stats(
     episodic_returns: List[int],
@@ -52,11 +52,13 @@ def eval_loop(
             action = agent.best_act(state)
             state, reward, done, _, _ = env.step(action)
             episodic_returns[-1] += reward
+        
     
     avg_return = _save_stats(episodic_returns, crt_step)
 
-    if avg_return > max_reward:
+    if avg_return > max_reward or avg_return == max_reward:
         max_reward = avg_return
+        print("Saved model, max reward: ", max_reward, " crt step: ", crt_step)
         torch.save(
             agent._policy.state_dict(),
             path_to_save_model
@@ -102,14 +104,16 @@ def train_loop(
 if __name__ == "__main__":
 
     # TODO: Remove hardcodings. This is just for test.
-    max_steps = 1000000
+    max_steps = 9000000
     gamma = 0.99
     lr = 1e-4
     seed = 13
     eval_episodes = 10
     grid_size = 16
-    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model.pt'
+    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_small.pt'
     device = torch.device('cuda:0')
+
+    print(torch.cuda.is_available())
 
     torch.manual_seed(seed)
 
@@ -119,7 +123,9 @@ if __name__ == "__main__":
             "Snake-v0",
             render_mode="rgb_array",
             window_size=768,
-            grid_size=grid_size
+            grid_size=grid_size,
+            number_of_rewards = 3,
+            render_frame=False
         ),
         device=device
     )
@@ -129,17 +135,18 @@ if __name__ == "__main__":
             render_mode="rgb_array",
             window_size=768,
             grid_size=grid_size,
+            number_of_rewards = 3,
             render_frame=False
         ),
         device=device
     )
 
-    policy = ActorCriticPolicy(map_size=grid_size, device=device).to(device)
+    policy = ActorCriticPolicy(map_size=grid_size + 2, num_of_layers=1, channels=[1], device=device).to(device)
     agent = A2C(
         policy=policy,
         gamma=gamma,
         optimizer=optim.Adam(policy.parameters(), lr=lr, eps=1e-05),
-        nsteps=8,
+        nsteps=5,
         device=device
     )
 

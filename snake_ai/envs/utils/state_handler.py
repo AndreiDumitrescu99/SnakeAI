@@ -16,7 +16,7 @@ class StateHandler:
         
         self.number_of_rewards = number_of_rewards
         self.rewards: List[Food] = []
-        self.map = np.zeros((self.map_size, self.map_size))
+        self.map = np.ones((self.map_size, self.map_size))
 
         self._init_map()
     
@@ -73,20 +73,29 @@ class StateHandler:
 
     def update_state(self, snake_position: List[Position]) -> float:
 
-        overall_score = -0.01
-
+        overall_score = -0.1
         for position in snake_position:
             if self._check_wall_collision(position):
                 return -100.0
         
+        sem = 0
         for position in snake_position:
             reward = self._check_food_collision(position)
             if reward is not None:
                 self.rewards.remove(reward)
                 self.map[reward.position[0], reward.position[1]] = ComponentCode.EMPTY_SPACE.value
                 overall_score += reward.value
-        
+                sem = 1
+
         self.fill_rewards()
+
+        if sem == 0:
+            distance = self.map_size ** 2
+            for reward in self.rewards:
+                current_distance = np.abs(reward.position[0] - snake_position[0][0]) + np.abs(reward.position[1] - snake_position[0][1])
+                distance = min(distance, current_distance)
+            
+            overall_score = overall_score - (-0.1 * 2) / distance            
 
         for position in self.snake_position:
             self.map[position[1], position[0]] = ComponentCode.EMPTY_SPACE.value

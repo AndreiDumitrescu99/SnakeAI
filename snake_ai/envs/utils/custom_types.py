@@ -17,10 +17,10 @@ class Action(Enum):
     MOVE_LEFT = 4
 
 class ComponentCode(Enum):
-    EMPTY_SPACE = 0
-    SNAKE = 1
-    WALL = 2
-    FOOD = 3
+    EMPTY_SPACE = 1
+    SNAKE = 2
+    WALL = 3
+    FOOD = 4
 
 class Color(Enum):
     WHITE = (255, 255, 255)

@@ -55,7 +55,7 @@ class A2C:
 
         return torch.argmax(pi.probs).item()
     
-    def learn(self, reward: int, state_: torch.Tensor, done: bool):
+    def learn(self, reward: float, state_: torch.Tensor, done: bool):
 
         self._rewards.append(reward)
 
@@ -66,18 +66,16 @@ class A2C:
     
     def _compute_returns(self, done: bool, state_: torch.Tensor, tau: float = 0.95) -> torch.Tensor:
 
-        next_value = self._policy(state_)[1].detach()
-        values = self._values + [next_value]
-        rewards = self._rewards
         returns = []
-        gae = 0
+        R = self._policy(state_)[1].detach() * (1 - done)
+        for r in self._rewards[::-1]:
+            R = r + self._gamma * R
+            returns.insert(0, R)
+        returns = torch.tensor(returns)
+        if len(returns) > 1:
+            returns = (returns - returns.mean()) / (returns.std() + self._fp32_err)
 
-        for t in reversed(range(len(rewards))):
-            delta = rewards[t] + self._gamma * values[t + 1] * (1 - done) - values[t]
-            gae = delta + self._gamma * tau * (1 - done) * gae
-            returns.insert(0, gae + values[t])
-
-        return torch.tensor(returns)
+        return returns
 
     def _update_policy(self, done: bool, state_: torch.Tensor):
 

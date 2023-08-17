@@ -24,13 +24,14 @@ def eval_loop(
                 state = torch.unsqueeze(state, 0)
 
             action = agent.best_act(state)
+            print(state, action)
             state, reward, done, _, _ = env.step(action)
             episodic_returns[-1] += reward
     
 if __name__ == "__main__":
 
     gamma = 0.99
-    grid_size = 16
+    grid_size = 8
     path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_small.pt'
     device = torch.device('cuda:0')
 
@@ -41,6 +42,7 @@ if __name__ == "__main__":
             render_mode="rgb_array",
             window_size=768,
             grid_size=grid_size,
+            number_of_rewards=1,
             render_frame=True
         ),
         device=device

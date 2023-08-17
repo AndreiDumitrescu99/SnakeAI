@@ -12,7 +12,7 @@ from snake_ai.envs.game_components.snake import Snake
 from snake_ai.envs.game_components.wall import Wall
 from snake_ai.envs.utils.state_handler import StateHandler
 from snake_ai.envs.game_components.food import Food
-from snake_ai.envs.utils.custom_types import Color
+from snake_ai.envs.utils.custom_types import Color, Reward
 
 class SnakeEnv(gym.Env):
 
@@ -84,7 +84,6 @@ class SnakeEnv(gym.Env):
 
         pygame.init()
         self.state_handler._print_map()
-        
         self.font = pygame.font.SysFont(pygame.font.get_default_font(), 24)
 
         self.text = None
@@ -114,7 +113,7 @@ class SnakeEnv(gym.Env):
         observation = self.state_handler.get_observation()
 
         # TODO: Change This!
-        if reward == -100.0 or self.overall_steps > 2500 or self.overall_reward >= 50.0 or self.overall_reward < -100.0:
+        if reward == Reward.DEATH.value or self.overall_steps > 2500 or self.overall_reward >= 100.0 or self.overall_reward < Reward.DEATH.value:
             return observation, reward, True, False, {}
 
         return observation, reward, False, False, {}

@@ -2,7 +2,7 @@ from typing import List, Tuple
 import torch as th
 import numpy as np
 from copy import deepcopy
-from snake_ai.envs.utils.custom_types import Position, ComponentCode
+from snake_ai.envs.utils.custom_types import Position, ComponentCode, Reward
 from snake_ai.envs.game_components.food import Food
 from snake_ai.envs.game_components.wall import Wall
 
@@ -25,6 +25,10 @@ class StateHandler:
         for wall in self.walls:
             self.map[wall.position[1], wall.position[0]] = ComponentCode.WALL.value
 
+        for position in self.snake_position:
+            self.map[position[1], position[0]] = ComponentCode.SNAKE.value
+
+        self.map[self.snake_position[0][1], self.snake_position[0][0]] = ComponentCode.SNAKE_HEAD.value
         # Init rewards
         self.fill_rewards()
 
@@ -35,7 +39,7 @@ class StateHandler:
             x = np.random.randint(0, self.map_size)
             y = np.random.randint(0, self.map_size)
 
-            if self.map[x, y] == ComponentCode.EMPTY_SPACE.value:
+            if self.map[y, x] == ComponentCode.EMPTY_SPACE.value:
                 return x, y
             
     def fill_rewards(self) -> None:
@@ -43,7 +47,7 @@ class StateHandler:
         while len(self.rewards) < self.number_of_rewards:
             position = self._get_random_reward()
 
-            self.map[position[0], position[1]] = ComponentCode.FOOD.value
+            self.map[position[1], position[0]] = ComponentCode.FOOD.value
             self.rewards.append(Food(position))
 
     @staticmethod
@@ -73,10 +77,10 @@ class StateHandler:
 
     def update_state(self, snake_position: List[Position]) -> float:
 
-        overall_score = -0.1
+        overall_score = Reward.MOVE.value
         for position in snake_position:
             if self._check_wall_collision(position):
-                return -100.0
+                return Reward.DEATH.value
         
         sem = 0
         for position in snake_position:
@@ -87,15 +91,13 @@ class StateHandler:
                 overall_score += reward.value
                 sem = 1
 
-        self.fill_rewards()
-
         if sem == 0:
             distance = self.map_size ** 2
             for reward in self.rewards:
                 current_distance = np.abs(reward.position[0] - snake_position[0][0]) + np.abs(reward.position[1] - snake_position[0][1])
                 distance = min(distance, current_distance)
             
-            overall_score = overall_score - (-0.1 * 2) / distance            
+            overall_score = overall_score - ((self.map_size - 2) / 2) * Reward.MOVE.value / distance          
 
         for position in self.snake_position:
             self.map[position[1], position[0]] = ComponentCode.EMPTY_SPACE.value
@@ -103,8 +105,10 @@ class StateHandler:
         for position in snake_position:
             self.map[position[1], position[0]] = ComponentCode.SNAKE.value
 
+        self.map[snake_position[0][1], snake_position[0][0]] = ComponentCode.SNAKE_HEAD.value
         self.snake_position = deepcopy(snake_position)
 
+        self.fill_rewards()
         return overall_score
     
     def _print_map(self) -> None:

@@ -53,9 +53,9 @@ class ActorCriticPolicy(nn.Module):
             map_size = map_size
         )
 
-        self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, 128, device=device)
-        self.policy = nn.Linear(128, self.action_num, device=device)
-        self.value = nn.Linear(128, 1, device=device)
+        self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, 32, device=device)
+        self.policy = nn.Linear(32, self.action_num, device=device)
+        self.value = nn.Linear(32, 1, device=device)
     
     def compute_conv_encoder_output_shape(
         self,

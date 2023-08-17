@@ -19,9 +19,14 @@ class Action(Enum):
 class ComponentCode(Enum):
     EMPTY_SPACE = 1
     SNAKE = 2
-    WALL = 3
-    FOOD = 4
+    SNAKE_HEAD = 3
+    WALL = 4
+    FOOD = 5
 
 class Color(Enum):
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
+
+class Reward(Enum):
+    DEATH = -10.0
+    MOVE = -0.1

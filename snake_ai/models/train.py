@@ -10,7 +10,7 @@ from snake_ai.models.a2c.policy import ActorCriticPolicy
 from snake_ai.envs.snake_env import SnakeEnv
 from snake_ai.models.utils.torch_wrapper import TorchWrapper
 
-LOG_INTERVAL = 2500
+LOG_INTERVAL = 5000
 max_reward = -100.0
 
 def _save_stats(
@@ -106,10 +106,12 @@ if __name__ == "__main__":
     # TODO: Remove hardcodings. This is just for test.
     max_steps = 9000000
     gamma = 0.99
-    lr = 1e-4
+    lr = 5e-3
     seed = 13
     eval_episodes = 10
-    grid_size = 16
+    grid_size = 8
+    number_of_rewards = 1
+    nsteps = 32
     path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_small.pt'
     device = torch.device('cuda:0')
 
@@ -124,7 +126,7 @@ if __name__ == "__main__":
             render_mode="rgb_array",
             window_size=768,
             grid_size=grid_size,
-            number_of_rewards = 3,
+            number_of_rewards=number_of_rewards,
             render_frame=False
         ),
         device=device
@@ -135,7 +137,7 @@ if __name__ == "__main__":
             render_mode="rgb_array",
             window_size=768,
             grid_size=grid_size,
-            number_of_rewards = 3,
+            number_of_rewards=number_of_rewards,
             render_frame=False
         ),
         device=device
@@ -146,7 +148,7 @@ if __name__ == "__main__":
         policy=policy,
         gamma=gamma,
         optimizer=optim.Adam(policy.parameters(), lr=lr, eps=1e-05),
-        nsteps=5,
+        nsteps=nsteps,
         device=device
     )
 

@@ -1,5 +1,7 @@
 import torch
 import torch.optim as optim
+from torchinfo import summary
+
 from gymnasium.envs.registration import register
 import gymnasium as gym
 from snake_ai.models.a2c.actor_critic import A2C
@@ -24,7 +26,7 @@ def eval_loop(
                 state = torch.unsqueeze(state, 0)
 
             action = agent.best_act(state)
-            print(state, action)
+            # print(state, action)
             state, reward, done, _, _ = env.step(action)
             episodic_returns[-1] += reward
     
@@ -43,12 +45,14 @@ if __name__ == "__main__":
             window_size=768,
             grid_size=grid_size,
             number_of_rewards=1,
-            render_frame=True
+            render_frame=False
         ),
         device=device
     )
 
     policy = ActorCriticPolicy(map_size=grid_size + 2, num_of_layers=1, channels=[1], device=device).to(device)
+    print(policy.embed_size)
+    print(summary(policy, (1, 10, 10)), policy)
     checkpoint = torch.load(path_to_save_model)
     print(checkpoint)
     policy.load_state_dict(checkpoint)

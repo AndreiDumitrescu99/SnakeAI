@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # TODO: Remove hardcodings. This is just for test.
     max_steps = 9000000
     gamma = 0.99
-    lr = 1e-5
+    lr = 1e-3
     seed = 13
     eval_episodes = 10
     grid_size = 8
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         apply_pooling=False,
         device=device,
     ).to(device)
-    
+
     policy.train()
     agent = A2C(
         policy=policy,

@@ -79,7 +79,6 @@ class A2C:
 
     def _update_policy(self, done: bool, state_: torch.Tensor):
 
-        self._t += 1
         returns = self._compute_returns(done, state_)
 
         values = torch.cat(self._values).squeeze(1)

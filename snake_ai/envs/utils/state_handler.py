@@ -73,7 +73,7 @@ class StateHandler:
     
     def get_observation(self) -> np.ndarray:
 
-        return np.reshape(self.map, [1, self.map_size, self.map_size])
+        return np.reshape((self.map - 1) / 3, [1, self.map_size, self.map_size])
 
     def update_state(self, snake_position: List[Position]) -> float:
 

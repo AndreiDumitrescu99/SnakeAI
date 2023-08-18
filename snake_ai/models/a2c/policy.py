@@ -13,6 +13,8 @@ class ActorCriticPolicy(nn.Module):
         num_of_layers: int = 4,
         channels: List[int] = [8, 16, 32, 64],
         action_num: int = 5,
+        hidden_embedding_size: int = 128,
+        apply_pooling: bool = True,
         device: torch.device = torch.device("cpu")
     ):
         super(ActorCriticPolicy, self).__init__()
@@ -23,6 +25,8 @@ class ActorCriticPolicy(nn.Module):
         self.in_channels = in_channels
         self.num_of_layers = num_of_layers
         self.channels = channels
+        self.hidden_embedding_size = hidden_embedding_size
+        self.apply_pooling = apply_pooling
 
         self.convs = [
             nn.Conv2d(
@@ -53,9 +57,9 @@ class ActorCriticPolicy(nn.Module):
         self.embed_size = self.compute_conv_encoder_output_shape(
             map_size = map_size
         )
-        self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, 10, device=device)
-        self.policy = nn.Linear(10, self.action_num, device=device)
-        self.value = nn.Linear(10, 1, device=device)
+        self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, self.hidden_embedding_size, device=device)
+        self.policy = nn.Linear(self.hidden_embedding_size, self.action_num, device=device)
+        self.value = nn.Linear(self.hidden_embedding_size, 1, device=device)
     
     def compute_conv_encoder_output_shape(
         self,
@@ -77,7 +81,8 @@ class ActorCriticPolicy(nn.Module):
                 shape = (shape + 2 * padding - 1 * (kernel_size - 1) - 1) // stride + 1
             
             # Compute output shape of a max pool layer.
-            shape = (shape - 1 * (pool_kernel_size - 1) - 1) // pool_stride + 1
+            if self.apply_pooling is True:
+                shape = (shape - 1 * (pool_kernel_size - 1) - 1) // pool_stride + 1
         
         return shape
 
@@ -87,7 +92,9 @@ class ActorCriticPolicy(nn.Module):
 
         # Embed the input through the Convolution Encoder.
         for i in range(self.num_of_layers):
-            internal_embedding = F.relu(self.pool(self.convs[i](internal_embedding)))
+            internal_embedding = self.convs[i](internal_embedding)
+            internal_embedding = self.pool(internal_embedding) if self.apply_pooling else internal_embedding
+            internal_embedding = F.relu(internal_embedding)
 
         # Linearize the embedding.
         internal_embedding = torch.reshape(internal_embedding, (-1, self.channels[-1] * self.embed_size * self.embed_size))

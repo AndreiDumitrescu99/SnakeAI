@@ -46,7 +46,6 @@ def play():
 
         # Processing:
         obs, reward, done, _, info = env.step(action)
-        print(obs)
 
         score = score + reward
         clock.tick(15)

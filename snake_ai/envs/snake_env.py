@@ -46,7 +46,7 @@ class SnakeEnv(gym.Env):
 
         # Get Snake Entity.
         self.snake = Snake(
-            size=5, # TODO: SHOULD BE CONFIGURABLE!
+            size=1, # TODO: SHOULD BE CONFIGURABLE!
             initial_head_position=(mid_point, mid_point)
         )
 
@@ -124,7 +124,7 @@ class SnakeEnv(gym.Env):
 
         # Get Snake Entity.
         self.snake = Snake(
-            size=5, # TODO: SHOULD BE CONFIGURABLE!
+            size=1, # TODO: SHOULD BE CONFIGURABLE!
             initial_head_position=(mid_point, mid_point)
         )
 
@@ -214,4 +214,4 @@ class SnakeEnv(gym.Env):
 
         # We need to ensure that human-rendering occurs at the predefined framerate.
         # The following line will automatically add a delay to keep the framerate stable.
-        self.clock.tick(30)
+        self.clock.tick(1)

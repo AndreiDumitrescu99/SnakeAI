@@ -50,7 +50,16 @@ if __name__ == "__main__":
         device=device
     )
 
-    policy = ActorCriticPolicy(map_size=grid_size + 2, num_of_layers=1, channels=[1], device=device).to(device)
+    policy = ActorCriticPolicy(
+        in_channels=1,
+        map_size=grid_size + 2,
+        num_of_layers=3,
+        channels=[1, 2, 4],
+        action_num=5,
+        hidden_embedding_size=128,
+        apply_pooling=False,
+        device=device,
+    ).to(device)
     print(policy.embed_size)
     print(summary(policy, (1, 10, 10)), policy)
     checkpoint = torch.load(path_to_save_model)

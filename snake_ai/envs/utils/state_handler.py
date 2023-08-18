@@ -80,6 +80,13 @@ class StateHandler:
         overall_score = Reward.MOVE.value
         for position in snake_position:
             if self._check_wall_collision(position):
+                for position in self.snake_position:
+                    self.map[position[1], position[0]] = ComponentCode.EMPTY_SPACE.value
+        
+                for position in snake_position:
+                    self.map[position[1], position[0]] = ComponentCode.SNAKE.value
+                
+                self.map[snake_position[0][1], snake_position[0][0]] = ComponentCode.WALL.value
                 return Reward.DEATH.value
         
         sem = 0

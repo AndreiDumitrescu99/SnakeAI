@@ -79,6 +79,7 @@ class A2C:
 
     def _update_policy(self, done: bool, state_: torch.Tensor):
 
+        self._t += 1
         returns = self._compute_returns(done, state_)
 
         values = torch.cat(self._values).squeeze(1)
@@ -90,7 +91,7 @@ class A2C:
         critic_loss = F.smooth_l1_loss(values.to(self._device), returns.to(self._device))
 
         self._optimizer.zero_grad()
-        (policy_loss + critic_loss - self._beta * entropy.mean()).backward()
+        (policy_loss + critic_loss - self._beta * entropy.mean()).backward() 
         self._optimizer.step()
 
         self._rewards.clear()

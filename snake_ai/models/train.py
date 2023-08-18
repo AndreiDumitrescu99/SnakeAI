@@ -106,13 +106,13 @@ if __name__ == "__main__":
     # TODO: Remove hardcodings. This is just for test.
     max_steps = 9000000
     gamma = 0.99
-    lr = 5e-3
+    lr = 1e-5
     seed = 13
     eval_episodes = 10
     grid_size = 8
     number_of_rewards = 1
     nsteps = 32
-    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_small.pt'
+    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model.pt'
     device = torch.device('cuda:0')
 
     print(torch.cuda.is_available())
@@ -143,7 +143,18 @@ if __name__ == "__main__":
         device=device
     )
 
-    policy = ActorCriticPolicy(map_size=grid_size + 2, num_of_layers=1, channels=[1], device=device).to(device)
+    policy = ActorCriticPolicy(
+        in_channels=1,
+        map_size=grid_size + 2,
+        num_of_layers=3,
+        channels=[1, 2, 4],
+        action_num=5,
+        hidden_embedding_size=128,
+        apply_pooling=False,
+        device=device,
+    ).to(device)
+    
+    policy.train()
     agent = A2C(
         policy=policy,
         gamma=gamma,

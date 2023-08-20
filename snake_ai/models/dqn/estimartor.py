@@ -1,10 +1,9 @@
-from typing import List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.distributions import Categorical
+from typing import List
 
-class ActorCriticPolicy(nn.Module):
+class Estimator(nn.Module):
 
     def __init__(
         self,
@@ -17,8 +16,9 @@ class ActorCriticPolicy(nn.Module):
         apply_pooling: bool = True,
         padding: str | int = "same",
         device: torch.device = torch.device("cpu")
-    ):
-        super(ActorCriticPolicy, self).__init__()
+    ) -> None:
+        
+        super(Estimator, self).__init__()
 
         assert num_of_layers == len(channels)
 
@@ -61,7 +61,6 @@ class ActorCriticPolicy(nn.Module):
         )
         self.affine = nn.Linear(channels[-1] * self.embed_size * self.embed_size, self.hidden_embedding_size, device=device)
         self.policy = nn.Linear(self.hidden_embedding_size, self.action_num, device=device)
-        self.value = nn.Linear(self.hidden_embedding_size, 1, device=device)
     
     def compute_conv_encoder_output_shape(
         self,
@@ -88,7 +87,7 @@ class ActorCriticPolicy(nn.Module):
         
         return shape
 
-    def forward(self, x: torch.Tensor) -> Tuple[Categorical, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
 
         internal_embedding = x
 
@@ -104,7 +103,6 @@ class ActorCriticPolicy(nn.Module):
         internal_embedding = F.relu(self.affine(internal_embedding))
 
         # Compute outputs.
-        pi = Categorical(F.softmax(self.policy(internal_embedding), dim=-1))
-        value = self.value(internal_embedding)
+        pi = self.policy(internal_embedding)
 
-        return pi, value
+        return pi

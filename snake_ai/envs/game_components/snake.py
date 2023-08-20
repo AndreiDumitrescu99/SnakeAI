@@ -40,8 +40,7 @@ class Snake(Renderable):
             )
     
     def act(self, action: Action):
-
-        # print(action, self._map_action_to_heading_direction)
+        
         self._heading_direction = self._heading_direction if action == Action.NOOP.value else self._map_action_to_heading_direction[action]
         future_head_position = PositionHandler.move_to_direction(self.head_position, self._heading_direction)
         self.body_parts.pop()

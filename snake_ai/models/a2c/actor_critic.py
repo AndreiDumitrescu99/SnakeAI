@@ -72,8 +72,8 @@ class A2C:
             R = r + self._gamma * R
             returns.insert(0, R)
         returns = torch.tensor(returns)
-        if len(returns) > 1:
-            returns = (returns - returns.mean()) / (returns.std() + self._fp32_err)
+        # if len(returns) > 1:
+        #     returns = (returns - returns.mean()) / (returns.std() + self._fp32_err)
 
         return returns
 

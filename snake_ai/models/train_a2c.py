@@ -10,7 +10,7 @@ from snake_ai.models.a2c.policy import ActorCriticPolicy
 from snake_ai.envs.snake_env import SnakeEnv
 from snake_ai.models.utils.torch_wrapper import TorchWrapper
 
-LOG_INTERVAL = 5000
+LOG_INTERVAL = 25000
 max_reward = -100.0
 
 def _save_stats(
@@ -23,7 +23,7 @@ def _save_stats(
     episodic_returns = torch.tensor(episodic_returns)
     avg_return = episodic_returns.mean().item()
     print(
-        "[{:07d}] eval results: R/ep={:03.2f}, std={:03.2f}, Max Reward={:03.2f}.".format(
+        "[{:08d}] eval results: R/ep={:03.2f}, std={:03.2f}, Max Reward={:03.2f}.".format(
             crt_step, avg_return, episodic_returns.std().item(), max_reward
         )
     )
@@ -104,14 +104,14 @@ def train_loop(
 if __name__ == "__main__":
 
     # TODO: Remove hardcodings. This is just for test.
-    max_steps = 9000000
+    max_steps = 90000000
     gamma = 0.99
     lr = 1e-3
     seed = 13
     eval_episodes = 10
-    grid_size = 8
+    grid_size = 5
     number_of_rewards = 1
-    nsteps = 32
+    nsteps = 11
     path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model.pt'
     device = torch.device('cuda:0')
 
@@ -131,6 +131,7 @@ if __name__ == "__main__":
         ),
         device=device
     )
+
     eval_env = TorchWrapper(
         gym.make(
             "Snake-v0",
@@ -151,6 +152,7 @@ if __name__ == "__main__":
         action_num=5,
         hidden_embedding_size=128,
         apply_pooling=False,
+        padding=0,
         device=device,
     ).to(device)
 

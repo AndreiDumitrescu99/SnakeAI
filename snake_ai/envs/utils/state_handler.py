@@ -16,7 +16,7 @@ class StateHandler:
         
         self.number_of_rewards = number_of_rewards
         self.rewards: List[Food] = []
-        self.map = np.ones((self.map_size, self.map_size))
+        self.map = np.ones((self.map_size, self.map_size), dtype=np.float32)
 
         self._init_map()
     
@@ -73,7 +73,7 @@ class StateHandler:
     
     def get_observation(self) -> np.ndarray:
 
-        return np.reshape((self.map - 1) / 3, [1, self.map_size, self.map_size])
+        return np.reshape(self.map / 5, [1, self.map_size, self.map_size])
 
     def update_state(self, snake_position: List[Position]) -> float:
 
@@ -104,7 +104,7 @@ class StateHandler:
                 current_distance = np.abs(reward.position[0] - snake_position[0][0]) + np.abs(reward.position[1] - snake_position[0][1])
                 distance = min(distance, current_distance)
             
-            overall_score = overall_score - ((self.map_size - 2) / 2) * Reward.MOVE.value / distance          
+            overall_score = overall_score - ((self.map_size - 2) / 2 + 1) * Reward.MOVE.value / distance          
 
         for position in self.snake_position:
             self.map[position[1], position[0]] = ComponentCode.EMPTY_SPACE.value

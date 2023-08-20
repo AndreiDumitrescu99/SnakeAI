@@ -33,8 +33,8 @@ def eval_loop(
 if __name__ == "__main__":
 
     gamma = 0.99
-    grid_size = 8
-    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_small.pt'
+    grid_size = 5
+    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model.pt'
     device = torch.device('cuda:0')
 
     register(id="Snake-v0", entry_point="snake_ai.envs.snake_env:SnakeEnv")
@@ -45,7 +45,7 @@ if __name__ == "__main__":
             window_size=768,
             grid_size=grid_size,
             number_of_rewards=1,
-            render_frame=False
+            render_frame=True
         ),
         device=device
     )
@@ -58,12 +58,13 @@ if __name__ == "__main__":
         action_num=5,
         hidden_embedding_size=128,
         apply_pooling=False,
+        padding=0,
         device=device,
     ).to(device)
-    print(policy.embed_size)
-    print(summary(policy, (1, 10, 10)), policy)
+    # print(policy.embed_size)
+    # print(summary(policy, (1, 10, 10)), policy)
     checkpoint = torch.load(path_to_save_model)
-    print(checkpoint)
+    # print(checkpoint)
     policy.load_state_dict(checkpoint)
 
     agent = A2C(

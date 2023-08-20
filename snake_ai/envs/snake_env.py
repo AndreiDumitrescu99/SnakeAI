@@ -214,4 +214,4 @@ class SnakeEnv(gym.Env):
 
         # We need to ensure that human-rendering occurs at the predefined framerate.
         # The following line will automatically add a delay to keep the framerate stable.
-        self.clock.tick(1)
+        self.clock.tick(5)

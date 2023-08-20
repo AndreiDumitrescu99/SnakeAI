@@ -29,4 +29,4 @@ class Color(Enum):
 
 class Reward(Enum):
     DEATH = -10.0
-    MOVE = -0.1
+    MOVE = 0.0

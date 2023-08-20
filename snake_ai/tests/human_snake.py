@@ -18,7 +18,7 @@ def play():
         "Snake-v0",
         render_mode="rgb_array",
         window_size=768,
-        grid_size=8,
+        grid_size=5,
     )
 
     clock = pygame.time.Clock()

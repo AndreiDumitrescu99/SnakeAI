@@ -9,9 +9,11 @@ from snake_ai.models.utils.epsilon_scheduler import get_epsilon_schedule
 from snake_ai.models.utils.replay_memory import ReplayMemory
 from snake_ai.models.utils.torch_wrapper import TorchWrapper
 
+
 def train(agent: DQN, env: SnakeEnv, step_num: int = 100_000):
     
     stats, N = {"step_idx": [0], "ep_rewards": [0.0], "ep_steps": [0.0]}, 0
+    max_reward = 0
 
     (state, info), done = env.reset(), False
     for step in range(step_num):
@@ -39,11 +41,20 @@ def train(agent: DQN, env: SnakeEnv, step_num: int = 100_000):
         
             # some more stats
             if N % 10 == 0:
-                print("[{0:3d}][{1:6d}], R/ep={2:6.2f}, steps/ep={3:2.0f}.".format(
+                print("[{0:3d}][{1:8d}], R/ep={2:6.2f}, steps/ep={3:2.0f}.".format(
                     N, step,
                     torch.tensor(stats["ep_rewards"][-10:]).mean().item(),
                     torch.tensor(stats["ep_steps"][-10:]).mean().item(),
                 ))
+
+                avg_reward = torch.tensor(stats["ep_rewards"][-10:]).mean().item()
+                if avg_reward > max_reward:
+                    max_reward = avg_reward
+                
+                torch.save(
+                    agent._estimator.state_dict(),
+                    'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_dqn_bigger.pt'
+                )
 
             stats["ep_rewards"].append(0.0)  # reward accumulator for a new episode
             stats["ep_steps"].append(0.0)    # reward accumulator for a new episode
@@ -64,7 +75,7 @@ def train(agent: DQN, env: SnakeEnv, step_num: int = 100_000):
 
 if __name__ == "__main__":
 
-    max_steps = 90000000
+    max_steps = 10000000
     gamma = 0.99
     lr = 1e-3
     seed = 13
@@ -72,6 +83,7 @@ if __name__ == "__main__":
     grid_size = 7
     number_of_rewards = 1
     nsteps = 11
+    snake_length = 5
     device = torch.device('cuda:0')
 
     torch.manual_seed(seed)
@@ -85,6 +97,7 @@ if __name__ == "__main__":
             window_size=768,
             grid_size=grid_size,
             number_of_rewards=number_of_rewards,
+            snake_length=snake_length,
             render_frame=False
         ),
         device=device
@@ -107,12 +120,12 @@ if __name__ == "__main__":
             net,
             ReplayMemory(size=10000, batch_size=32, device=device),
             torch.optim.Adam(net.parameters(), lr=1e-3, eps=1e-4),
-            get_epsilon_schedule(start=1.0, end=0.1, steps=1000000),
+            get_epsilon_schedule(start=1.0, end=0.1, steps=2000000),
             action_num=5,
             warmup_steps=1000,
             update_steps=2,
             update_target_steps=256
         ),
         env,
-        step_num=9000000  # change the experiment length if it's learning but not reaching about .95
+        step_num=max_steps  # change the experiment length if it's learning but not reaching about .95
     )

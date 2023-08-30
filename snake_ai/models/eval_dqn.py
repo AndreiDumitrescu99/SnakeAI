@@ -27,8 +27,9 @@ if __name__ == "__main__":
     seed = 13
     eval_episodes = 10
     grid_size = 7
+    snake_length = 5
     number_of_rewards = 1
-    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\last_model_dqn_bigger.pt'
+    path_to_save_model = 'C:\\Users\\andre\\Desktop\\PersonalProjects\\SnakeAI\\runs\\best_model_dqn_bigger.pt'
     device = torch.device('cuda:0')
 
     torch.manual_seed(seed)
@@ -42,7 +43,8 @@ if __name__ == "__main__":
             window_size=768,
             grid_size=grid_size,
             number_of_rewards=number_of_rewards,
-            render_frame=True
+            render_frame=True,
+            snake_length = snake_length
         ),
         device=device
     )

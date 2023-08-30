@@ -113,6 +113,12 @@ class StateHandler:
             self.map[position[1], position[0]] = ComponentCode.SNAKE.value
 
         self.map[snake_position[0][1], snake_position[0][0]] = ComponentCode.SNAKE_HEAD.value
+
+        for i, position in enumerate(snake_position):
+
+            if StateHandler.check_position_overlap(snake_position[0], snake_position[i]) and i != 0:
+                return Reward.DEATH.value
+  
         self.snake_position = deepcopy(snake_position)
 
         self.fill_rewards()

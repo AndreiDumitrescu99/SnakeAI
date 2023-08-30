@@ -18,7 +18,8 @@ def play():
         "Snake-v0",
         render_mode="rgb_array",
         window_size=768,
-        grid_size=5,
+        grid_size=7,
+        snake_length=5
     )
 
     clock = pygame.time.Clock()
@@ -48,7 +49,7 @@ def play():
         obs, reward, done, _, info = env.step(action)
 
         score = score + reward
-        clock.tick(15)
+        clock.tick(60)
 
         if done:
             env.render()

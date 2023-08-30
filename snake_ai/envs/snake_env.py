@@ -21,6 +21,7 @@ class SnakeEnv(gym.Env):
         window_size: int = 512,
         grid_size: int = 8,
         number_of_rewards: int = 1,
+        snake_length: int = 1,
         debug_grid: bool = True,
         render_frame: bool = True,
         render_score: bool = True,
@@ -31,6 +32,7 @@ class SnakeEnv(gym.Env):
 
         self.window_size = window_size
         self.grid_size = grid_size + 2 # We add the outer walls.
+        self.snake_length = snake_length
 
         self.window = None
         self.clock = None
@@ -46,7 +48,7 @@ class SnakeEnv(gym.Env):
 
         # Get Snake Entity.
         self.snake = Snake(
-            size=1, # TODO: SHOULD BE CONFIGURABLE!
+            size=self.snake_length,
             initial_head_position=(mid_point, mid_point)
         )
 
@@ -124,7 +126,7 @@ class SnakeEnv(gym.Env):
 
         # Get Snake Entity.
         self.snake = Snake(
-            size=1, # TODO: SHOULD BE CONFIGURABLE!
+            size=self.snake_length, # TODO: SHOULD BE CONFIGURABLE!
             initial_head_position=(mid_point, mid_point)
         )
 
@@ -214,4 +216,4 @@ class SnakeEnv(gym.Env):
 
         # We need to ensure that human-rendering occurs at the predefined framerate.
         # The following line will automatically add a delay to keep the framerate stable.
-        self.clock.tick(5)
+        self.clock.tick(10)
